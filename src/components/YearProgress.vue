@@ -1,7 +1,7 @@
 <template>
 	<div class="progressbar">
 		<progress percent="60" activeColor="#EA5A49" />
-		<p>{{year}}已经过去了{{days}}天，{{percent}}%</p>
+		<p>{{year}}年已经过去了{{days}}天，{{percent}}%，多看看书吧！</p>
 	</div>
 </template>
 
@@ -53,6 +53,9 @@
 		width:100%;
 		progress{
 			margin-bottom:10px;
+		}
+		p{
+			font-size:30rpx;
 		}
 	}
 </style>

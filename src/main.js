@@ -5,6 +5,8 @@ Vue.config.productionTip = false;
 App.mpType = 'app';
 
 const app = new Vue(App);
+
+//手动挂载
 app.$mount();
 
 export default {

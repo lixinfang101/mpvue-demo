@@ -1,9 +1,11 @@
 <template>
   <div class="container">
-    <div class="userinfo" @click="login">
+    <!-- <div class="userinfo" @click="login">
       <img :src="userinfo.avatarUrl" alt="">
       <p>{{userinfo.nickName}}</p>
-    </div>
+    </div> -->
+
+    <button open-type="getUserInfo" lang="zh_CN" @getuserinfo="login">登录</button>
 
     <year-progress></year-progress>
 
@@ -31,25 +33,34 @@
           'year-progress' : YearProgress
         },
         methods : {
-            login(){
-                let user = wx.getStorageSync('userinfo')
-                const self = this
-                if (!user) {
-                  qcloud.setLoginUrl(config.loginUrl)
-                  qcloud.login({
-                    success: function (userinfo) {
-                      qcloud.request({
-                        url: config.userUrl,
-                        login: true,
-                        success (userRes) {
-                          showSuccess('登录成功')
-                          wx.setStorageSync('userinfo', userRes.data.data);
-                          self.userinfo = userRes.data.data;
-                        }
-                      })
+            login(e){
+              let that = this;
+              //qcloud.setLoginUrl(config.loginUrl);
+              wx.login({
+                success : function(loginResult){
+                  let loginParams = {
+                    code : loginResult.code,
+                    encryptedData : e.mp.detail.encryptedData,
+                    iv : e.mp.detail.iv
+                  };
+
+                  //qcloud.setLoginUrl(config.loginUrl);
+
+                  qcloud.requestLogin({
+                    loginParams,
+                    success(){
+                      showSuccess('登录成功');
+                     // that.setStorageSync('userinfo',);
+                    },
+                    fail(error){
+                      console.log('登录失败-inner',error);
                     }
-                  })
+                  });
+                },
+                fail : function(loginError){
+                  console.log('登录失败-outer',loginError);
                 }
+              });
             },
             scanBook(){
               wx.scanCode({

@@ -3,8 +3,8 @@ const CONF = {
     tunnelServerUrl: '',
     tunnelSignatureKey: '27fb7d1c161b7ca52d73cce0f1d833f9f5b5ec89',
     // 腾讯云相关配置可以查看云 API 秘钥控制台：https://console.cloud.tencent.com/capi
-    qcloudAppId: '',
-    qcloudSecretId: '1256760766',
+    qcloudAppId: '1256760766',
+    qcloudSecretId: 'AKIDFKHGiAdvBXrkbItoih1UxreOGes0avqo',
     qcloudSecretKey: 'Nk7atFxW4SuZRN9rVyHUYZUVRRMNKAqf',
     wxMessageToken: 'weixinmsgtoken',
     networkTimeout: 30000,
@@ -30,7 +30,7 @@ const CONF = {
         port: 3306,
         user: 'root',
         db: 'cauth',
-        pass: '123456', //wxd6ce9be0a6701cd9
+        pass: 'lxf123456', //wxd6ce9be0a6701cd9
         char: 'utf8mb4'
     },
 

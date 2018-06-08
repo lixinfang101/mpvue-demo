@@ -19,8 +19,7 @@ export function get(url){
 export function showSuccess(text){
   wx.showToast({
     title : text,
-    icon : 'success',
-
+    icon : 'success'
   });
 }
 
