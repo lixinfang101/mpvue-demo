@@ -34,4 +34,16 @@ router.post('/message', controllers.message.post)
 
 router.get('/demo',controllers.demo);
 
-module.exports = router
+//新增图书
+router.post('/addbook',controllers.addbook.post);
+
+//获取图书列表数据
+router.get('/booklist',controllers.booklist.get);
+
+//根据id获取图书详情
+router.get('/bookdetail',controllers.bookdetail.get);
+
+//获取图书访问量的排行
+router.get('/booktop',controllers.booktop.get);
+
+module.exports = router;
