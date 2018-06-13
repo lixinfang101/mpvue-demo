@@ -1,15 +1,16 @@
 <template>
   <div class="container">
-    <!-- <div class="userinfo" @click="login">
+    
+    <div class="userinfo" @click="login" v-if="isLogin">
       <img :src="userinfo.avatarUrl" alt="">
       <p>{{userinfo.nickName}}</p>
-    </div> -->
+    </div>
 
-    <button open-type="getUserInfo" lang="zh_CN" @getuserinfo="login">登录</button>
+    <button open-type="getUserInfo" lang="zh_CN" @getuserinfo="login" class="btn marginTop" v-if="!isLogin">登录</button>
 
     <year-progress></year-progress>
 
-    <button class="btn" @click="scanBook">添加图书</button>
+    <button class="btn" @click="scanBook" v-if="isLogin">添加图书</button>
   </div>
 </template>
 
@@ -26,8 +27,9 @@
               userinfo : {
                 avatarUrl : '../../../static/img/unlogin.png',
                 nickName : '点击登录',
-                openId : '123'
-              }
+                openId : ''
+              },
+              isLogin : false
             }
         },
         components : {
@@ -35,12 +37,8 @@
         },
         methods : {
             login(e){
-              let that = this;
-
-              console.log(e.mp.detail.userInfo);
-
+              let self = this;
               let user = wx.getStorageSync('userinfo');
-
               if(!user){
                 qcloud.setLoginUrl(config.loginUrl);
                 qcloud.login({
@@ -49,60 +47,49 @@
                       url : config.userUrl,
                       login : true,
                       success(userRes){
-                        console.log('登录成功',userinfo);
                         showSuccess('登录成功');
-                        wx.setStorageSync('userinfo',userinfo);
-                        self.userinfo = userRes.data.data;
+                        self.isLogin = true;
+                        self.userinfo = {
+                          avatarUrl : userinfo.avatarUrl,
+                          nickName : userinfo.nickName,
+                          openId : userinfo.openId
+                        };
+                        wx.setStorageSync('userinfo',self.userinfo);
                       },
-                      fail : ()=>{
-                        console.log('登录失败');
+                      fail : (e)=>{
+                        showModal('错误','登录失败');
                       }
                     });
                   },
                   fail : (err)=>{
-                    console.log("<<<<<<<<error========",err);
+                    showModal('错误','登录失败');
                   }
                 });
               }
 
-              //qcloud.setLoginUrl(config.loginUrl);
-              // wx.login({
-              //   success : function(loginResult){
-              //     let loginParams = {
-              //       code : loginResult.code,
-              //       encryptedData : e.mp.detail.encryptedData,
-              //       iv : e.mp.detail.iv
-              //     };
-
-              //     //qcloud.setLoginUrl(config.loginUrl);
-
-              //     qcloud.requestLogin({
-              //       loginParams,
-              //       success(){
-              //         showSuccess('登录成功');
-              //        // that.setStorageSync('userinfo',);
-              //       },
-              //       fail(error){
-              //         console.log('登录失败-inner',error);
-              //       }
-              //     });
-              //   },
-              //   fail : function(loginError){
-              //     console.log('登录失败-outer',loginError);
-              //   }
-              // });
             },
             scanBook(){
               //只允许从照相机扫码
-              // wx.scanCode({
-              //   onlyFromCamera: true,
-              //   success: (res) => {
-              //     if(res.result){
-              //       this.addBook(res.result);
-              //     }
-              //   }
-              // });
-              this.addBook("9787115275790");
+              wx.scanCode({
+                onlyFromCamera: true,
+                success: (res) => {
+                  if(res.result){
+                    this.addBook(res.result);
+                  }
+                }
+              });
+
+              /*
+                //9787111562108
+                //9787111460787
+                //9787115335500
+                //9787801830340
+                //9787111514428
+                //9787111514435
+                //9787111435938
+                //9787115275790
+              */
+              //this.addBook("9787115275790");
             },
             async addBook(isbn){
               let res = await post('/weapp/addbook',{isbn,openid : this.userinfo.openId});
@@ -115,6 +102,17 @@
                 showModal('添加失败',res.data.msg);
               }
             }
+        },
+        mounted(){
+          let userinfo = wx.getStorageSync('userinfo');
+          if(userinfo){
+            this.isLogin = true;
+            this.userinfo = {
+              avatarUrl : userinfo.avatarUrl,
+              nickName : userinfo.nickName,
+              openId : userinfo.openId
+            };
+          }
         }
     }
 </script>
@@ -131,6 +129,14 @@
         margin:20rpx;
         border-radius:50%;
       }
+    }
+    .marginTop{
+      margin-top:240rpx;
+    }
+    .btn{
+      color:#fff;
+      background:#EA5A49;
+      margin-bottom:10rpx;
     }
   }
 </style>

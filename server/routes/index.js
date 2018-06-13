@@ -46,4 +46,10 @@ router.get('/bookdetail',controllers.bookdetail.get);
 //获取图书访问量的排行
 router.get('/booktop',controllers.booktop.get);
 
+//保存图书评论信息
+router.post('/addcomment',controllers.addcomment.post);
+
+//根据图书id获取图书的所有评论信息
+router.get('/bookcomment',controllers.bookcomment.get);
+
 module.exports = router;
