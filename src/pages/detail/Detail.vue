@@ -1,7 +1,8 @@
 <template>
 	<div>
-		<bookinfo :book="book" :tags="tags" :summary="summary"/>
-		<div class="comment">
+		<bookinfo :book="book" :tags="tags" :summary="summary" :avatarUrl="avatarUrl"/>
+		<comment-list :comments="comments"></comment-list>
+		<div class="comment" v-if="showAdd">
 			<textarea v-model="comment" class="textarea" :maxlength="100" placeholder="请输入图书短评"></textarea>
 			<div class="location">
 				地理位置：
@@ -15,6 +16,9 @@
 			</div>
 			<button class="btn" @click="addComment">评论</button>
 		</div>
+		<div v-else class="text-footer">
+			未登录或者已经评论过了
+		</div>
 		<button class="btn" open-type="share">转发给好友</button>
 	</div>
 </template>
@@ -22,6 +26,7 @@
 <script>
 	import {get,post,showSuccess,showModal} from '@/util'
 	import BookInfo from '@/components/BookInfo.vue'
+	import CommentList from '@/components/CommentList.vue'
 
 	export default{
 		data(){
@@ -32,7 +37,10 @@
 				phone : '',
 				location : '',
 				tags : [],
-				summary : ''
+				summary : '',
+				userInfo : '',
+				comments : [],
+				avatarUrl : ''
 			}
 		},
 		methods : {
@@ -42,7 +50,7 @@
 				}
 				//请求后台接口，保存评论信息
 				let data = {
-					openid : '123',
+					openid : this.userInfo.openId,
 					bookid : this.bookid,
 					comment : this.comment,
 					phone : this.phone,
@@ -52,7 +60,9 @@
 				let result = await post('/weapp/addcomment',{data});
 
 				if(result.code == 0){
+					this.comment = '';
 					showSuccess('评论图书成功');
+					this.getComments();
 				}else{
 					showModal('错误','评论图书失败');
 				}
@@ -61,8 +71,10 @@
 			async getBookDetail(id){	//根据图书id，获取图书详情信息
 				let book = await get('/weapp/bookdetail?bookid=' + id);
 				this.book = book;
-				this.tags = book.tags.split(',');
+				this.avatarUrl = book.user_info.image;
+				this.tags = book.tags;
 				this.summary = book.summary;
+				
 				//设置详情页面标题
 				wx.setNavigationBarTitle({
 					title : this.book.title
@@ -104,8 +116,7 @@
 			},
 			async getComments(){	//获取这本书的所有评论
 				let comments = await get('/weapp/bookcomment?bookid='+this.bookid);
-
-				console.log("<<<<<<<<前端获取图书评论=========",comments);
+				this.comments = comments;
 			}
 		},
 		mounted(){
@@ -115,9 +126,27 @@
 			this.getComments();
 			this.phone = '';
 			this.location = '';
+			let user = wx.getStorageSync('userinfo');
+			if(user){
+				this.userInfo = user;
+			}
 		},
 		components : {
-			bookinfo : BookInfo
+			'bookinfo' : BookInfo,
+			'comment-list' : CommentList
+		},
+		computed:{
+			showAdd(){
+				//没有登录
+				if(!this.userInfo.openId){
+					return false;
+				}
+				//当前用户已经评价过此书
+				if(this.comments.filter(v=>v.openid === this.userInfo.openId).length){
+					return false;
+				}
+				return true;
+			}
 		}
 	}
 </script>
@@ -148,5 +177,10 @@
 		color:#fff;
 		background:#EA5A49;
 		margin-bottom:10rpx;
+	}
+	.text-footer{
+		text-align:center;
+		font-size:24rpx;
+		margin-bottom:20rpx;
 	}
 </style>

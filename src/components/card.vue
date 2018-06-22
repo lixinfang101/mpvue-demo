@@ -10,12 +10,12 @@
 	    		<div class="row-rate right text-color">{{book.rate}}<v-rate :score="book.rate"/></v-rate></div>
 	    	</div>
 	    	<div class="row">
-	    		<div class="left">{{book.author}}</div>
-	    		<div class="right">浏览量：{{book.count}}</div>
+	    		<div class="left" style="width:135px;">{{book.author}}</div>
+	    		<div class="right text-color">浏览量：{{book.count}}</div>
 	    	</div>
 	    	<div class="row">
 	    		<div class="left">{{book.publisher}}</div>
-	    		<div class="right">添加人：</div>
+	    		<div class="right">{{book.user_info.nickName}}</div>
 	    	</div>
 	    </div>
 	  </div>
@@ -34,6 +34,9 @@ export default {
   	detailUrl(){
   		return '/pages/detail/main?id=' + this.book.id
   	}
+  },
+  mounted(){
+    
   }
 }
 </script>
@@ -66,7 +69,7 @@ export default {
     		margin-bottom:6rpx;
     		.left{
     			float:left;
-	    		margin-right:160rpx;
+	    		margin-right:130rpx;
 	    	}
     		.right{
 	    		float:right;

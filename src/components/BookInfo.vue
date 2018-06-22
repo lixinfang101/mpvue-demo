@@ -9,7 +9,7 @@
 			</div>
 		</div>
 		<div class="detail">
-			<img src="" class="avatar" mode="aspectFit">
+			<img :src="avatarUrl" class="avatar" mode="aspectFit">
 			小木吒
 			<div class="right text-primary">
 				{{book.rate}}分
@@ -24,7 +24,7 @@
 			<div class="badge" v-for="tag in tags" :key="tag">{{tag}}</div>
 		</div>
 		<div class="summary">
-			<p>{{summary}}</p>
+			<p v-for="(item,xh) in summary" :key="xh">{{item}}</p>
 		</div>
 	</div>
 </template>
@@ -38,7 +38,7 @@
 
 			}
 		},
-		props : ['book','tags','summary'],
+		props : ['book','tags','summary','avatarUrl'],
 		components : {
 			'v-rate' : Rate
 		}

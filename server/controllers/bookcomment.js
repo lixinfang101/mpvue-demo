@@ -5,13 +5,30 @@ let {mysql} = require('../qcloud.js');
 */
 
 async function get(ctx,next){
-	let {bookid} = ctx.request.query;
+	let {bookid,openid} = ctx.request.query;
 
-	console.log("<<<<<<<<<<后端获取图书id=========",bookid);
+	console.log("<<<<<<<<",bookid,openid);
 
+	let mysqlSelect = mysql('comments')
+						.select('comments.*','cSessionInfo.user_info')
+						.join('cSessionInfo','comments.openid','cSessionInfo.open_id');
+	let comments = '';
+
+	if(bookid){
+		comments = await mysqlSelect.where('bookid',bookid);
+	}else if(openid){
+		comments = await mysqlSelect.where('openid',openid);
+	}
+					
 	ctx.state = {
 		code : 0,
-		data : {}
+		data : comments.map(v=>{
+			let info = JSON.parse(v.user_info);
+			return Object.assign({},v,{
+				title : info.nickName,
+				image : info.avatarUrl
+			})
+		})
 	};
 }
 
